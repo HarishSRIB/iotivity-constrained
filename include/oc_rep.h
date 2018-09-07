@@ -539,4 +539,21 @@ bool oc_rep_get_object(oc_rep_t *rep, const char *key, oc_rep_t **value);
 */
 bool oc_rep_get_object_array(oc_rep_t *rep, const char *key, oc_rep_t **value);
 
+
+// Harish - demo support
+#define oc_rep_add_next_item(rep, item) (rep->next = item)
+oc_rep_t* oc_rep_new_int(const char *key, int value);
+oc_rep_t* oc_rep_new_boolean(const char *key, bool value);
+oc_rep_t* oc_rep_new_double(const char *key, double value);
+oc_rep_t* oc_rep_new_byte_string(const char *key, uint8_t *value, int size);
+oc_rep_t* oc_rep_new_string(const char *key, const char *value, int size);
+oc_rep_t* oc_rep_new_object(const char *key, oc_rep_t *value);
+oc_rep_t* oc_rep_new_int_array(const char *key, int *values, int size);
+oc_rep_t* oc_rep_new_boolean_array(const char *key, bool *values, int size);
+oc_rep_t* oc_rep_new_double_array(const char *key, double *values, int size);
+oc_rep_t* oc_rep_new_byte_string_array(const char *key, oc_string_array_t values, int size);
+oc_rep_t* oc_rep_new_string_array(const char *key, oc_string_array_t values, int size);
+oc_rep_t* oc_rep_new_object_array(const char *key);
+void oc_rep_object_array_add_item(oc_rep_t *rep, oc_rep_t *item);
+
 #endif /* OC_REP_H */

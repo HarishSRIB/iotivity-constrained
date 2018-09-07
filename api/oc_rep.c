@@ -552,3 +552,168 @@ oc_rep_get_object_array(oc_rep_t *rep, const char *key, oc_rep_t **value)
 {
   return oc_rep_get_value(rep, OC_REP_OBJECT_ARRAY, key, (void **)value, NULL);
 }
+
+// HARISH - Demo support
+static void
+_oc_rep_set_key(oc_rep_t *rep, const char *key)
+{
+  oc_new_string(&rep->name, key, strlen(key));
+}
+
+oc_rep_t*
+oc_rep_new_int(const char *key, int value)
+{
+  oc_rep_t* rep = _alloc_rep();
+  // set key
+  _oc_rep_set_key(rep, key);
+  // set value
+  rep->type = OC_REP_INT;
+  rep->value.integer = value;
+  return rep;
+}
+
+oc_rep_t*
+oc_rep_new_boolean(const char *key, bool value)
+{
+  oc_rep_t* rep = _alloc_rep();
+  // set key
+  _oc_rep_set_key(rep, key);
+  // set value
+  rep->type = OC_REP_BOOL;
+  rep->value.boolean = value;
+  return rep;
+}
+
+oc_rep_t*
+oc_rep_new_double(const char *key, double value)
+{
+  oc_rep_t* rep = _alloc_rep();
+  // set key
+  _oc_rep_set_key(rep, key);
+  // set value
+  rep->type = OC_REP_DOUBLE;
+  rep->value.double_p = value;
+  return rep;
+}
+
+oc_rep_t*
+oc_rep_new_byte_string(const char *key, uint8_t *value, int size)
+{
+  oc_rep_t* rep = _alloc_rep();
+  // set key
+  _oc_rep_set_key(rep, key);
+  // set value
+  rep->type = OC_REP_BYTE_STRING;
+  oc_alloc_string(&rep->value.string, size);
+  memcpy(oc_string(rep->value.string), value, size);
+  return rep;
+}
+
+oc_rep_t*
+oc_rep_new_string(const char *key, const char *value, int size)
+{
+  oc_rep_t* rep = _alloc_rep();
+  // set key
+  _oc_rep_set_key(rep, key);
+  // set value
+  rep->type = OC_REP_STRING;
+  oc_new_string(&rep->value.string,value, size);
+  return rep;
+}
+
+oc_rep_t*
+oc_rep_new_object(const char *key, oc_rep_t *value)
+{
+  oc_rep_t* rep = _alloc_rep();
+  // set key
+  _oc_rep_set_key(rep, key);
+  // set value
+  rep->type = OC_REP_OBJECT;
+  rep->value.object = value;
+  return rep;
+}
+
+oc_rep_t*
+oc_rep_new_int_array(const char *key, int *values, int size)
+{
+  oc_rep_t* rep = _alloc_rep();
+  // set key
+  _oc_rep_set_key(rep, key);
+  // set value
+  rep->type = OC_REP_INT | OC_REP_ARRAY;
+  oc_new_int_array(&rep->value.array, size);
+  memcpy(oc_int_array(rep->value.array), values, sizeof(int)*size);
+  return rep;
+}
+
+oc_rep_t*
+oc_rep_new_boolean_array(const char *key, bool *values, int size)
+{
+  oc_rep_t* rep = _alloc_rep();
+  // set key
+  _oc_rep_set_key(rep, key);
+  // set value
+  rep->type = OC_REP_BOOL | OC_REP_ARRAY;
+  oc_new_bool_array(&rep->value.array, size);
+  memcpy(oc_bool_array(rep->value.array), values, sizeof(bool)*size);
+  return rep;
+}
+
+oc_rep_t*
+oc_rep_new_double_array(const char *key, double *values, int size)
+{
+  oc_rep_t* rep = _alloc_rep();
+  // set key
+  _oc_rep_set_key(rep, key);
+  // set value
+  rep->type = OC_REP_DOUBLE | OC_REP_ARRAY;
+  oc_new_double_array(&rep->value.array, size);
+  memcpy(oc_double_array(rep->value.array), values, sizeof(double)*size);
+  return rep;
+}
+
+oc_rep_t*
+oc_rep_new_byte_string_array(const char *key, oc_string_array_t values, int size)
+{
+  oc_rep_t* rep = _alloc_rep();
+  // set key
+  _oc_rep_set_key(rep, key);
+  // set value
+  rep->type = OC_REP_BYTE_STRING | OC_REP_ARRAY;
+  oc_new_string_array(&rep->value.array, size);
+  memcpy(oc_string(rep->value.array), oc_string(values), size * STRING_ARRAY_ITEM_MAX_LEN);
+  return rep;
+}
+
+oc_rep_t*
+oc_rep_new_string_array(const char *key, oc_string_array_t values, int size)
+{
+  oc_rep_t* rep = _alloc_rep();
+  // set key
+  _oc_rep_set_key(rep, key);
+  // set value
+  rep->type = OC_REP_STRING | OC_REP_ARRAY;
+  oc_new_string_array(&rep->value.array, size);
+  memcpy(oc_string(rep->value.array), oc_string(values), size * STRING_ARRAY_ITEM_MAX_LEN);
+  return rep;
+}
+
+oc_rep_t*
+oc_rep_new_object_array(const char *key)
+{
+  oc_rep_t* rep = _alloc_rep();
+  _oc_rep_set_key(rep, key);
+  rep->type = OC_REP_OBJECT | OC_REP_ARRAY;
+  return rep;
+}
+
+void
+oc_rep_object_array_add_item(oc_rep_t *rep, oc_rep_t *item)
+{
+  oc_rep_t **last = &rep->value.object_array;
+  while ((*last)->next != NULL) {
+    last = &(*last)->next;
+  }
+
+  *last = item;
+}
