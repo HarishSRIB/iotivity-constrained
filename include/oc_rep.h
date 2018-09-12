@@ -542,18 +542,48 @@ bool oc_rep_get_object_array(oc_rep_t *rep, const char *key, oc_rep_t **value);
 
 // Harish - demo support
 #define oc_rep_add_next_item(rep, item) (rep->next = item)
-oc_rep_t* oc_rep_new_int(const char *key, int value);
-oc_rep_t* oc_rep_new_boolean(const char *key, bool value);
-oc_rep_t* oc_rep_new_double(const char *key, double value);
-oc_rep_t* oc_rep_new_byte_string(const char *key, uint8_t *value, int size);
-oc_rep_t* oc_rep_new_string(const char *key, const char *value, int size);
-oc_rep_t* oc_rep_new_object(const char *key, oc_rep_t *value);
-oc_rep_t* oc_rep_new_int_array(const char *key, int *values, int size);
-oc_rep_t* oc_rep_new_boolean_array(const char *key, bool *values, int size);
-oc_rep_t* oc_rep_new_double_array(const char *key, double *values, int size);
-oc_rep_t* oc_rep_new_byte_string_array(const char *key, oc_string_array_t values, int size);
-oc_rep_t* oc_rep_new_string_array(const char *key, oc_string_array_t values, int size);
-oc_rep_t* oc_rep_new_object_array(const char *key);
+
+/*
+
+Sample Representation:-
+
+{
+ "int" : 10
+ "bool" : false
+ "double" : 3.142
+ "string" : "harish"
+ "object": {
+  "company" : "samsung"
+ }
+}
+
+Code for the above representation:-
+
+oc_rep_t* cur_rep = NULL, *root_rep = NULL;
+root_rep = oc_rep_new_int("int", 10); cur_rep = root_rep;
+cur_rep->next = oc_rep_new_boolean("bool", false); cur_rep = cur_rep->next;
+cur_rep->next = oc_rep_new_double("double", 3.142); cur_rep = cur_rep->next;
+cur_rep->next = oc_rep_new_string("string", "harish", strlen("harish")); cur_rep = cur_rep->next;
+
+oc_rep_t* rep2 = oc_rep_new_string("company", "samsung",  strlen("samsung"));
+
+cur_rep->next = oc_rep_new_object("object", rep2); cur_rep = cur_rep->next;
+*/
+
+void oc_free_rep_ext(struct oc_memb *rep_pool, oc_rep_t *rep);
+
+oc_rep_t* oc_rep_new_int(struct oc_memb *rep_pool, const char *key, int value);
+oc_rep_t* oc_rep_new_boolean(struct oc_memb *rep_pool, const char *key, bool value);
+oc_rep_t* oc_rep_new_double(struct oc_memb *rep_pool, const char *key, double value);
+oc_rep_t* oc_rep_new_byte_string(struct oc_memb *rep_pool, const char *key, uint8_t *value, int size);
+oc_rep_t* oc_rep_new_string(struct oc_memb *rep_pool, const char *key, const char *value, int size);
+oc_rep_t* oc_rep_new_object(struct oc_memb *rep_pool, const char *key, oc_rep_t *value);
+oc_rep_t* oc_rep_new_int_array(struct oc_memb *rep_pool, const char *key, int *values, int size);
+oc_rep_t* oc_rep_new_boolean_array(struct oc_memb *rep_pool, const char *key, bool *values, int size);
+oc_rep_t* oc_rep_new_double_array(struct oc_memb *rep_pool, const char *key, double *values, int size);
+oc_rep_t* oc_rep_new_byte_string_array(struct oc_memb *rep_pool, const char *key, oc_string_array_t values, int size);
+oc_rep_t* oc_rep_new_string_array(struct oc_memb *rep_pool, const char *key, oc_string_array_t values, int size);
+oc_rep_t* oc_rep_new_object_array(struct oc_memb *rep_pool, const char *key);
 void oc_rep_object_array_add_item(oc_rep_t *rep, oc_rep_t *item);
 
 #endif /* OC_REP_H */
