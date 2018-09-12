@@ -560,10 +560,62 @@ _oc_rep_set_key(oc_rep_t *rep, const char *key)
   oc_new_string(&rep->name, key, strlen(key));
 }
 
-oc_rep_t*
-oc_rep_new_int(const char *key, int value)
+static oc_rep_t *
+_alloc_rep_ext(struct oc_memb *rep_pool)
 {
-  oc_rep_t* rep = _alloc_rep();
+  oc_rep_t *rep = oc_memb_alloc(rep_pool);
+  if (rep != NULL) {
+    rep->name.size = 0;
+  }
+#ifdef OC_DEBUG
+  oc_assert(rep != NULL);
+#endif
+  return rep;
+}
+
+void
+oc_free_rep_ext(struct oc_memb *rep_pool, oc_rep_t *rep)
+{
+  if (rep == 0)
+    return;
+  oc_free_rep(rep->next);
+  switch (rep->type) {
+  case OC_REP_BYTE_STRING_ARRAY:
+  case OC_REP_STRING_ARRAY:
+    oc_free_string_array(&rep->value.array);
+    break;
+  case OC_REP_BOOL_ARRAY:
+    oc_free_bool_array(&rep->value.array);
+    break;
+  case OC_REP_DOUBLE_ARRAY:
+    oc_free_double_array(&rep->value.array);
+    break;
+  case OC_REP_INT_ARRAY:
+    oc_free_int_array(&rep->value.array);
+    break;
+  case OC_REP_BYTE_STRING:
+  case OC_REP_STRING:
+    oc_free_string(&rep->value.string);
+    break;
+  case OC_REP_OBJECT:
+    oc_free_rep(rep->value.object);
+    break;
+  case OC_REP_OBJECT_ARRAY:
+    oc_free_rep(rep->value.object_array);
+    break;
+  default:
+    break;
+  }
+  if (rep->name.size > 0)
+    oc_free_string(&rep->name);
+    oc_memb_free(rep_pool, rep);
+}
+
+
+oc_rep_t*
+oc_rep_new_int(struct oc_memb *rep_pool, const char *key, int value)
+{
+  oc_rep_t* rep = _alloc_rep_ext(rep_pool);
   // set key
   _oc_rep_set_key(rep, key);
   // set value
@@ -573,9 +625,9 @@ oc_rep_new_int(const char *key, int value)
 }
 
 oc_rep_t*
-oc_rep_new_boolean(const char *key, bool value)
+oc_rep_new_boolean(struct oc_memb *rep_pool, const char *key, bool value)
 {
-  oc_rep_t* rep = _alloc_rep();
+  oc_rep_t* rep = _alloc_rep_ext(rep_pool);
   // set key
   _oc_rep_set_key(rep, key);
   // set value
@@ -585,9 +637,9 @@ oc_rep_new_boolean(const char *key, bool value)
 }
 
 oc_rep_t*
-oc_rep_new_double(const char *key, double value)
+oc_rep_new_double(struct oc_memb *rep_pool, const char *key, double value)
 {
-  oc_rep_t* rep = _alloc_rep();
+  oc_rep_t* rep = _alloc_rep_ext(rep_pool);
   // set key
   _oc_rep_set_key(rep, key);
   // set value
@@ -597,9 +649,9 @@ oc_rep_new_double(const char *key, double value)
 }
 
 oc_rep_t*
-oc_rep_new_byte_string(const char *key, uint8_t *value, int size)
+oc_rep_new_byte_string(struct oc_memb *rep_pool, const char *key, uint8_t *value, int size)
 {
-  oc_rep_t* rep = _alloc_rep();
+  oc_rep_t* rep = _alloc_rep_ext(rep_pool);
   // set key
   _oc_rep_set_key(rep, key);
   // set value
@@ -610,9 +662,9 @@ oc_rep_new_byte_string(const char *key, uint8_t *value, int size)
 }
 
 oc_rep_t*
-oc_rep_new_string(const char *key, const char *value, int size)
+oc_rep_new_string(struct oc_memb *rep_pool, const char *key, const char *value, int size)
 {
-  oc_rep_t* rep = _alloc_rep();
+  oc_rep_t* rep = _alloc_rep_ext(rep_pool);
   // set key
   _oc_rep_set_key(rep, key);
   // set value
@@ -622,9 +674,9 @@ oc_rep_new_string(const char *key, const char *value, int size)
 }
 
 oc_rep_t*
-oc_rep_new_object(const char *key, oc_rep_t *value)
+oc_rep_new_object(struct oc_memb *rep_pool, const char *key, oc_rep_t *value)
 {
-  oc_rep_t* rep = _alloc_rep();
+  oc_rep_t* rep = _alloc_rep_ext(rep_pool);
   // set key
   _oc_rep_set_key(rep, key);
   // set value
@@ -634,9 +686,9 @@ oc_rep_new_object(const char *key, oc_rep_t *value)
 }
 
 oc_rep_t*
-oc_rep_new_int_array(const char *key, int *values, int size)
+oc_rep_new_int_array(struct oc_memb *rep_pool, const char *key, int *values, int size)
 {
-  oc_rep_t* rep = _alloc_rep();
+  oc_rep_t* rep = _alloc_rep_ext(rep_pool);
   // set key
   _oc_rep_set_key(rep, key);
   // set value
@@ -647,9 +699,9 @@ oc_rep_new_int_array(const char *key, int *values, int size)
 }
 
 oc_rep_t*
-oc_rep_new_boolean_array(const char *key, bool *values, int size)
+oc_rep_new_boolean_array(struct oc_memb *rep_pool, const char *key, bool *values, int size)
 {
-  oc_rep_t* rep = _alloc_rep();
+  oc_rep_t* rep = _alloc_rep_ext(rep_pool);
   // set key
   _oc_rep_set_key(rep, key);
   // set value
@@ -660,9 +712,9 @@ oc_rep_new_boolean_array(const char *key, bool *values, int size)
 }
 
 oc_rep_t*
-oc_rep_new_double_array(const char *key, double *values, int size)
+oc_rep_new_double_array(struct oc_memb *rep_pool, const char *key, double *values, int size)
 {
-  oc_rep_t* rep = _alloc_rep();
+  oc_rep_t* rep = _alloc_rep_ext(rep_pool);
   // set key
   _oc_rep_set_key(rep, key);
   // set value
@@ -673,9 +725,9 @@ oc_rep_new_double_array(const char *key, double *values, int size)
 }
 
 oc_rep_t*
-oc_rep_new_byte_string_array(const char *key, oc_string_array_t values, int size)
+oc_rep_new_byte_string_array(struct oc_memb *rep_pool, const char *key, oc_string_array_t values, int size)
 {
-  oc_rep_t* rep = _alloc_rep();
+  oc_rep_t* rep = _alloc_rep_ext(rep_pool);
   // set key
   _oc_rep_set_key(rep, key);
   // set value
@@ -686,9 +738,9 @@ oc_rep_new_byte_string_array(const char *key, oc_string_array_t values, int size
 }
 
 oc_rep_t*
-oc_rep_new_string_array(const char *key, oc_string_array_t values, int size)
+oc_rep_new_string_array(struct oc_memb *rep_pool, const char *key, oc_string_array_t values, int size)
 {
-  oc_rep_t* rep = _alloc_rep();
+  oc_rep_t* rep = _alloc_rep_ext(rep_pool);
   // set key
   _oc_rep_set_key(rep, key);
   // set value
@@ -699,9 +751,9 @@ oc_rep_new_string_array(const char *key, oc_string_array_t values, int size)
 }
 
 oc_rep_t*
-oc_rep_new_object_array(const char *key)
+oc_rep_new_object_array(struct oc_memb *rep_pool, const char *key)
 {
-  oc_rep_t* rep = _alloc_rep();
+  oc_rep_t* rep = _alloc_rep_ext(rep_pool);;
   _oc_rep_set_key(rep, key);
   rep->type = OC_REP_OBJECT | OC_REP_ARRAY;
   return rep;
